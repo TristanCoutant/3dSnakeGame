@@ -3,23 +3,60 @@ using UnityEngine.InputSystem;
 
 public class Move : MonoBehaviour
 {
-    public float speed = 1f;
+    [SerializeField] private Transform snake;
+    [SerializeField] private GridManager gridManager;
+    [SerializeField] private float interval;
 
-    void FixedUpdate()
+    private float timer = 0f;
+    public int i, j;
+    private float direction = 2f; // 1: up, 2: right, 3: down, 4: left
+    void Start()
     {
-        float vertical = 0f;
-        float horizontal = 0f;
+        gridManager.GenerateGrid();
+        InitializePosition();
+    }
 
-        // WASD et les fleches
+    private void InitializePosition()
+    {
+        i = gridManager.width / 4;
+        j = gridManager.height / 2;
+        snake.position = gridManager.PositionOfTile(i, j);
+        var p = snake.position;
+        snake.position = new Vector3(p.x, 0.0001f, p.z);
+    }
+
+    private void UpdatePosition()
+    {
+        if (direction == 1) j += 1;
+        else if (direction == 2) i += 1;
+        else if (direction == 3) j -= 1;
+        else if (direction == 4) i -= 1;
+        snake.position = gridManager.PositionOfTile(i, j);
+        var p = snake.position;
+        snake.position = new Vector3(p.x, 0.0001f, p.z);
+    }
+    
+    void Update()
+    {
         if (Keyboard.current != null)
         {
-            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) vertical += speed;
-            if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) vertical -= speed;
-            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) horizontal -= speed;
-            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) horizontal += speed;
+            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) { direction = 1; };
+            
+            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) { direction = 2; };
+                
+            if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) { direction = 3; };
+                
+            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) { direction = 4; };
+                
+            
+                
         }
-
-        Vector3 movement = new Vector3(horizontal, 0f, vertical);
-        transform.Translate(movement * speed * Time.deltaTime, Space.Self);
+        
+        timer += Time.deltaTime;
+        if (timer >= interval)
+        {
+            timer = 0f;
+            UpdatePosition();
+        }
     }
 }

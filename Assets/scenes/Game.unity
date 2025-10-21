@@ -155,8 +155,8 @@ Camera:
   m_GameObject: {fileID: 330585543}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.21495225, g: 0.4339623, b: 0.116678536, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 1
@@ -179,7 +179,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 73.479935
+  field of view: 40.628754
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -205,8 +205,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.70710677, y: 0, z: 0, w: 0.70710677}
-  m_LocalPosition: {x: 0, y: 60, z: 0}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 189.67978, z: 0.000014334762}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -446,7 +446,7 @@ GameObject:
   - component: {fileID: 1878093183}
   - component: {fileID: 1878093187}
   m_Layer: 0
-  m_Name: snake
+  m_Name: SnakeHead
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -538,7 +538,7 @@ Transform:
   m_GameObject: {fileID: 1878093181}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 0, y: 0.001, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -556,7 +556,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 845f114f591c2c847adea22660483c21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Move
-  speed: 1
+  snake: {fileID: 1878093186}
+  gridManager: {fileID: 2093333943}
+  interval: 0.5
+  i: 0
+  j: 0
 --- !u!1 &2093333942
 GameObject:
   m_ObjectHideFlags: 0
@@ -586,10 +590,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5935ba14d66e0314fba85073d023a184, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
-  width: 10
-  height: 5
+  width: 25
+  height: 15
   tilePrefab: {fileID: 8642656268130161709, guid: 2b0e5386529aafe44b70f7589c30507a, type: 3}
   cam: {fileID: 330585546}
+  parentObject: {fileID: 2093333944}
 --- !u!4 &2093333944
 Transform:
   m_ObjectHideFlags: 0
@@ -612,5 +617,5 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
-  - {fileID: 1878093186}
   - {fileID: 2093333944}
+  - {fileID: 1878093186}
