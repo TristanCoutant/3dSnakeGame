@@ -2,14 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tile : MonoBehaviour
+public class Tile: MonoBehaviour
 {
     [SerializeField] private Color baseColor, offsetColor;
     [SerializeField] private MeshRenderer _renderer;
 
     void Start()
     {
-        // Ensure _renderer is assigned
         if (_renderer == null)
         {
             _renderer = GetComponent<MeshRenderer>();

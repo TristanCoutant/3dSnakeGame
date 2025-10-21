@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class Move : MonoBehaviour
 {
-    [SerializeField] private Transform snake;
+    [SerializeField] private Transform snakeHead;
     [SerializeField] private GridManager gridManager;
     [SerializeField] private float interval;
 
@@ -20,9 +20,9 @@ public class Move : MonoBehaviour
     {
         i = gridManager.width / 4;
         j = gridManager.height / 2;
-        snake.position = gridManager.PositionOfTile(i, j);
-        var p = snake.position;
-        snake.position = new Vector3(p.x, 0.0001f, p.z);
+        snakeHead.position = gridManager.PositionOfTile(i, j);
+        var p = snakeHead.position;
+        snakeHead.position = new Vector3(p.x, 1f, p.z);
     }
 
     private void UpdatePosition()
@@ -44,9 +44,9 @@ public class Move : MonoBehaviour
         else if (j == gridManager.height)
         { j = 0; }
 
-        snake.position = gridManager.PositionOfTile(i, j);
-        var p = snake.position;
-        snake.position = new Vector3(p.x, 0.0001f, p.z);
+        snakeHead.position = gridManager.PositionOfTile(i, j);
+        var p = snakeHead.position;
+        snakeHead.position = new Vector3(p.x, 1f, p.z);
         }
         
     void Update()
