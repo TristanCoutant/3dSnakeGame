@@ -31,11 +31,24 @@ public class Move : MonoBehaviour
         else if (direction == 2) i += 1;
         else if (direction == 3) j -= 1;
         else if (direction == 4) i -= 1;
+
+        if (i < 0)
+        { i = gridManager.width-1; }
+
+        else if (j < 0)
+        { j = gridManager.height-1; }
+
+        else if (i == gridManager.width)
+        { i = 0; }
+
+        else if (j == gridManager.height)
+        { j = 0; }
+
         snake.position = gridManager.PositionOfTile(i, j);
         var p = snake.position;
         snake.position = new Vector3(p.x, 0.0001f, p.z);
-    }
-    
+        }
+        
     void Update()
     {
         if (Keyboard.current != null)
