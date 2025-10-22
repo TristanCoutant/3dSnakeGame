@@ -36,10 +36,26 @@ public class Move : MonoBehaviour
 
     private void UpdatePosition()
     {
-        if (direction == 1) j += 1;
-        else if (direction == 2) i += 1;
-        else if (direction == 3) j -= 1;
-        else if (direction == 4) i -= 1;
+        if (direction == 1)
+        {
+            j += 1;
+            snakeHead.rotation = Quaternion.Euler(0f, 0f, 0f);
+        }
+        else if (direction == 2)
+        {
+            i += 1;
+            snakeHead.rotation = Quaternion.Euler(0f, 90f, 0f);
+        }
+        else if (direction == 3)
+        {
+            j -= 1;
+            snakeHead.rotation = Quaternion.Euler(0f, 180f, 0f);
+        }
+        else if (direction == 4)
+        {
+            i -= 1;
+            snakeHead.rotation = Quaternion.Euler(0f, 270f, 0f);
+        }
 
         if (i < 0) i = gridManager.width - 1;
         else if (i == gridManager.width) i = 0;
@@ -60,6 +76,7 @@ public class Move : MonoBehaviour
 
         UpdateBodySegments();
     }
+
 
     private void UpdateBodySegments()
     {
