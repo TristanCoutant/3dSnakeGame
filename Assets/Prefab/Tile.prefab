@@ -116,8 +116,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74620c0c3f990e444a89338e65b63fe4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tile
-  baseColor: {r: 0.43137255, g: 0.7372549, b: 0.3647059, a: 0.8156863}
-  offsetColor: {r: 0.4, g: 0.5019608, b: 0.3137255, a: 0}
+  baseColor: {r: 0.42290697, g: 0.7372549, b: 0.36470586, a: 0.8156863}
+  offsetColor: {r: 0.42108512, g: 0.5754717, b: 0.29045033, a: 0}
   _renderer: {fileID: 296098550114655555}
 --- !u!33 &7480560855120781775
 MeshFilter:

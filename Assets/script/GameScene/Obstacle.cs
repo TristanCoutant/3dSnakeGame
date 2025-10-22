@@ -10,7 +10,7 @@ public class Obstacle : MonoBehaviour
     [SerializeField] private Transform parentObject;
     [SerializeField] private GamePoints GamePoints;
 
-    private float interval = 5f;
+    private float interval = 4f;
     private float timer;
     private float maxObstacles;
     private Vector3 currentBonus;
@@ -41,9 +41,6 @@ public class Obstacle : MonoBehaviour
     {
         if (GamePoints.IsSnakeDead) return;
         if (spawnedObstacles.Count >= maxObstacles) return;
-
-        int maxAttempts = 100;
-        for (int attempt = 0; attempt < maxAttempts; attempt++)
         {
             int x = Random.Range(0, GridManager.width);
             int z = Random.Range(0, GridManager.height);
@@ -57,26 +54,26 @@ public class Obstacle : MonoBehaviour
                 spawnedObstacle.name = $"Obstacle ({x}/{z})";
 
                 spawnedObstacles.Add(spawnedObstacle);
-                break;
             }
         }
     }
 
-    private bool IsTileOccupied(int x, int z)
-    {
-        Vector3 checkPos = GridManager.PositionOfTile(x, z);
+    public bool IsTileOccupied(int x, int z)
+        {
+            Vector3 checkPos = GridManager.PositionOfTile(x, z);
 
-        if (checkPos == snakeHead.position || checkPos == currentBonus)
-            return true;
+            if (checkPos == snakeHead.position || checkPos == currentBonus)
+                return true;
 
         foreach (GameObject obstacle in spawnedObstacles)
-        {
-            if (obstacle != null && obstacle.transform.position == checkPos)
-                return true;
+            {
+                if (obstacle != null && obstacle.transform.position == checkPos)
+                    return true;
+            }
+
+            return false;
         }
 
-        return false;
-    }
 
     private void CheckIfSnakeIsDead()
     {

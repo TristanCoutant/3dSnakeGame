@@ -10,12 +10,14 @@ public class GamePoints : MonoBehaviour
     [SerializeField] private AudioClip WinSound;
     [SerializeField] private AudioClip LoseSound;
     [SerializeField] private AudioSource AudioSource;
+    [SerializeField] private Obstacle obstacleManager;
 
     private GameObject currentBonus;
 
     public int score = 0;
     public int HighScore = 0;
     public bool IsSnakeDead = false;
+    public bool IsTileOccupied = true;
 
     void Start()
     {
@@ -50,13 +52,21 @@ public class GamePoints : MonoBehaviour
     {
         if (!IsSnakeDead)
         {
-            int x = Random.Range(0, GridManager.width);
-            int z = Random.Range(0, GridManager.height);
 
-            Vector3 newPos = GridManager.PositionOfTile(x, z);
-            newPos = new Vector3(newPos.x, 1f, newPos.z);
+            while (IsTileOccupied==true)
+            {
+                int x = Random.Range(0, GridManager.width);
+                int z = Random.Range(0, GridManager.height);
 
-            currentBonus.transform.position = newPos;
+                if (!obstacleManager.IsTileOccupied(x, z))
+                {
+                    Vector3 newPos = GridManager.PositionOfTile(x, z);
+                    newPos = new Vector3(newPos.x, 1f, newPos.z);
+
+                    currentBonus.transform.position = newPos;
+                    return;
+                }
+            }
         }
     }
 
