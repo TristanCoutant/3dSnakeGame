@@ -44,13 +44,4 @@ public class GridManager : MonoBehaviour
         float offsetZ = -height / 2f + 0.5f;
         return new Vector3(x + offsetX, 0f, z + offsetZ) + center;
     }
-    public Vector3 PositionOfTileBonus(int x, int z)
-    {
-        Vector3 center = transform.position;
-        float offsetX = -width / 2f + 0.5f;
-        float offsetZ = -height / 2f + 0.5f;
-        return new Vector3(x + offsetX, 0f, z + offsetZ) + center;
-    }
 }
-
-

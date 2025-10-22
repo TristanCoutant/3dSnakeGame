@@ -10,6 +10,7 @@ public class Move : MonoBehaviour
     private float timer = 0f;
     public int i, j;
     private float direction = 2f; // 1: up, 2: right, 3: down, 4: left
+    public Vector3 snakeHeadPosition;
     void Start()
     {
         gridManager.GenerateGrid();
