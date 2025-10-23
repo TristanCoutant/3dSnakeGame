@@ -5,21 +5,17 @@ public class SceneManagement : MonoBehaviour
 {
     [SerializeField] private float delaySeconds = 10f;
     [SerializeField] private string gameSceneName; 
-    [SerializeField] private string startSceneName;
+    [SerializeField] private string startSceneName; 
 
     [SerializeField] private Transform persistentObjectTransform; 
 
-    private void Awake()
+    private void Start()
     {
         if (persistentObjectTransform != null)
         {
             DontDestroyOnLoad(persistentObjectTransform.gameObject);
         }
-        else
-        {
-            Debug.LogWarning("persistentObjectTransform non assigné !");
-        }
-    }
+    }  
 
     private void Start()
     {
