@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 69106940}
   - component: {fileID: 69106939}
   m_Layer: 0
-  m_Name: BonusObject
+  m_Name: GamePoints
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -148,17 +148,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1381208e0410f9948890d5d71dee1735, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GamePoints
-  GridManager: {fileID: 2093333943}
+  gridManager: {fileID: 2093333943}
   bonusPrefab: {fileID: 919132149155446097, guid: 22f1be29c87af2441ba785d57797ceb2, type: 3}
   snakeHead: {fileID: 2025351848}
-  WinSound: {fileID: 8300000, guid: 57b9049d3c11b1342835bd841949e305, type: 3}
-  LoseSound: {fileID: 8300000, guid: 937f603a6fd802f40b1f70779b6eea75, type: 3}
-  AudioSource: {fileID: 83918640}
+  winSound: {fileID: 8300000, guid: 57b9049d3c11b1342835bd841949e305, type: 3}
+  loseSound: {fileID: 8300000, guid: 937f603a6fd802f40b1f70779b6eea75, type: 3}
+  audioSource: {fileID: 83918640}
   obstacleManager: {fileID: 505912612}
-  score: 0
-  HighScore: 0
-  IsSnakeDead: 0
-  IsTileOccupied: 1
 --- !u!4 &69106940
 Transform:
   m_ObjectHideFlags: 0
@@ -389,8 +385,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 189.67978, z: 0.000014334762}
+  m_LocalRotation: {x: 0.70710677, y: 0, z: 0, w: 0.70710677}
+  m_LocalPosition: {x: 0, y: 107.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -542,11 +538,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53adcd7735b2ce64893f3bcdd76f6b8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
-  GridManager: {fileID: 2093333943}
+  gridManager: {fileID: 2093333943}
   obstaclePrefab: {fileID: 9138936923029414438, guid: 779daf426b9c3ab43bce695acfae26aa, type: 3}
   snakeHead: {fileID: 2025351848}
   parentObject: {fileID: 505912613}
-  GamePoints: {fileID: 69106939}
+  gamePoints: {fileID: 69106939}
 --- !u!4 &505912613
 Transform:
   m_ObjectHideFlags: 0
@@ -757,12 +753,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Move
   snakeHead: {fileID: 2025351848}
   bodySegmentPrefab: {fileID: -8679921383154817045, guid: f382a5bfa635efc45adb16891875e17e, type: 3}
-  gridManager: {fileID: 2093333943}
-  interval: 0.2
-  gamePoints: {fileID: 69106939}
   parentBodyObject: {fileID: 2025351848}
-  i: 0
-  j: 0
+  gridManager: {fileID: 2093333943}
+  gamePoints: {fileID: 69106939}
+  interval: 0.2
 --- !u!4 &2025351848 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 80366833f259ac9488734a55360f0072, type: 3}
