@@ -1,109 +1,78 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GamePoints : MonoBehaviour
 {
-    [SerializeField] private GridManager GridManager;
+    [SerializeField] private GridManager gridManager;
     [SerializeField] private GameObject bonusPrefab;
     [SerializeField] private Transform snakeHead;
-    [SerializeField] private AudioClip WinSound;
-    [SerializeField] private AudioClip LoseSound;
-    [SerializeField] private AudioSource AudioSource;
+    [SerializeField] private AudioClip winSound;
+    [SerializeField] private AudioClip loseSound;
+    [SerializeField] private AudioSource audioSource;
     [SerializeField] private Obstacle obstacleManager;
 
     private GameObject currentBonus;
 
-    public int score = 0;
-    public int HighScore = 0;
-    public bool IsSnakeDead = false;
-    public bool IsTileOccupied = true;
+    public int Score { get; private set; }
+    public int HighScore { get; private set; }
+    public bool IsSnakeDead { get; private set; }
 
-    void Start()
+    private void Start()
     {
-        SpawnBonus(); 
+        SpawnBonus();
     }
 
-    void Update()
+    private void Update()
     {
-        if (currentBonus != null && snakeHead.position == currentBonus.transform.position)
+        if (IsSnakeDead || currentBonus == null) return;
+
+        if (Vector3.Distance(snakeHead.position, currentBonus.transform.position) < 0.1f)
         {
             MoveBonus();
-            score += 1;
-            AudioSource.PlayOneShot(WinSound);
+            Score++;
+            audioSource.PlayOneShot(winSound);
         }
     }
 
-    public void SpawnBonus()
+    private void SpawnBonus()
     {
-        if (!IsSnakeDead)
-        {
-            int x = Random.Range(0, GridManager.width);
-            int z = Random.Range(0, GridManager.height);
+        if (IsSnakeDead) return;
 
-            Vector3 spawnPos = GridManager.PositionOfTile(x, z);
-            spawnPos = new Vector3(spawnPos.x, 1f, spawnPos.z);
-
-            currentBonus = Instantiate(bonusPrefab, spawnPos, Quaternion.identity);
-        }        
+        Vector3 spawnPos = GetRandomFreePosition();
+        currentBonus = Instantiate(bonusPrefab, spawnPos, Quaternion.identity);
     }
 
     private void MoveBonus()
     {
-        if (!IsSnakeDead)
+        if (IsSnakeDead) return;
+        currentBonus.transform.position = GetRandomFreePosition();
+    }
+
+    private Vector3 GetRandomFreePosition()
+    {
+        while (true)
         {
+            int x = Random.Range(0, gridManager.width);
+            int z = Random.Range(0, gridManager.height);
 
-            while (IsTileOccupied==true)
+            if (!obstacleManager.IsTileOccupied(x, z))
             {
-                int x = Random.Range(0, GridManager.width);
-                int z = Random.Range(0, GridManager.height);
-
-                if (!obstacleManager.IsTileOccupied(x, z))
-                {
-                    Vector3 newPos = GridManager.PositionOfTile(x, z);
-                    newPos = new Vector3(newPos.x, 1f, newPos.z);
-
-                    currentBonus.transform.position = newPos;
-                    return;
-                }
+                Vector3 pos = gridManager.PositionOfTile(x, z);
+                return new Vector3(pos.x, 1f, pos.z);
             }
         }
     }
 
-    public void SetHighScore()
-    {
-        if (score > HighScore)
-        {
-            HighScore = score;
-        }
-        score = 0;
-    }
-
-    public Vector3 currentBonusPosition()
-    {
-        if (!IsSnakeDead && currentBonus != null)
-        {
-            return currentBonus.transform.position;
-        }
-        else
-        {
-            Debug.Log("Snake is dead!");
-            return Vector3.zero;
-        }
-    }
+    public Vector3 CurrentBonusPosition() => IsSnakeDead || currentBonus == null ? Vector3.zero : currentBonus.transform.position;
 
     public void SnakeDead()
     {
-        SetHighScore();
+        if (Score > HighScore) HighScore = Score;
+        Score = 0;
 
-        if (currentBonus != null)
-            Destroy(currentBonus);
+        if (currentBonus) Destroy(currentBonus);
+        if (snakeHead) Destroy(snakeHead.gameObject);
 
-        if (snakeHead != null)
-            Destroy(snakeHead.gameObject);
-
-        AudioSource.PlayOneShot(LoseSound);
-
+        audioSource.PlayOneShot(loseSound);
         IsSnakeDead = true;
     }
 }

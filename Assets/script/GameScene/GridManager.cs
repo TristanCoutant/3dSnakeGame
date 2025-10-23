@@ -8,14 +8,13 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Transform cam;
     [SerializeField] private Transform parentObject;
 
-    private bool isGridGenerated = false;
+    private bool isGridGenerated;
 
     public void GenerateGrid()
     {
         if (isGridGenerated) return;
 
         Vector3 center = transform.position;
-
         float offsetX = -width / 2f + 0.5f;
         float offsetZ = -height / 2f + 0.5f;
 
@@ -23,17 +22,18 @@ public class GridManager : MonoBehaviour
         {
             for (int z = 0; z < height; z++)
             {
-                Vector3 spawnPos = new Vector3(x + offsetX, 0, z + offsetZ) + center;
+                Vector3 spawnPos = new(x + offsetX, 0, z + offsetZ);
+                spawnPos += center;
 
-                var spawnedTile = Instantiate(tilePrefab, spawnPos, Quaternion.identity, parentObject);
-                spawnedTile.name = $"Tile ({x}/{z})";
+                Tile tile = Instantiate(tilePrefab, spawnPos, Quaternion.identity, parentObject);
+                tile.name = $"Tile ({x}/{z})";
 
-                var isOffset = (x % 2 == 0 && z % 2 != 0) || (x % 2 != 0 && z % 2 == 0);
-                spawnedTile.Init(isOffset);
+                bool isOffset = (x + z) % 2 != 0;
+                tile.Init(isOffset);
             }
         }
 
-        cam.transform.position = center + new Vector3(0, 25, 0);
+        cam.position = center + new Vector3(0, 25, 0);
         isGridGenerated = true;
     }
 

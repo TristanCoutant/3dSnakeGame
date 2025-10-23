@@ -1,92 +1,78 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Obstacle : MonoBehaviour
 {
-    [SerializeField] private GridManager GridManager;
+    [SerializeField] private GridManager gridManager;
     [SerializeField] private GameObject obstaclePrefab;
     [SerializeField] private Transform snakeHead;
     [SerializeField] private Transform parentObject;
-    [SerializeField] private GamePoints GamePoints;
+    [SerializeField] private GamePoints gamePoints;
 
-    private float interval = 4f;
+    private readonly List<GameObject> spawnedObstacles = new();
     private float timer;
     private float maxObstacles;
-    private Vector3 currentBonus;
+    private const float SpawnInterval = 4f;
 
-    private List<GameObject> spawnedObstacles = new List<GameObject>();
-
-    void Start()
+    private void Start()
     {
-        timer = 0f;
-        maxObstacles = (GridManager.width * GridManager.height) / 2f;
+        maxObstacles = (gridManager.width * gridManager.height) / 2f;
     }
 
-    void Update()
+    private void Update()
     {
-        currentBonus = GamePoints.currentBonusPosition();
-        timer += Time.deltaTime;
+        if (gamePoints.IsSnakeDead) return;
 
-        if (timer >= interval)
+        timer += Time.deltaTime;
+        if (timer >= SpawnInterval)
         {
             timer = 0f;
             SpawnObstacle();
         }
 
-        CheckIfSnakeIsDead();
+        CheckCollision();
     }
 
     private void SpawnObstacle()
     {
-        if (GamePoints.IsSnakeDead) return;
         if (spawnedObstacles.Count >= maxObstacles) return;
-        {
-            int x = Random.Range(0, GridManager.width);
-            int z = Random.Range(0, GridManager.height);
 
-            if (!IsTileOccupied(x, z))
-            {
-                Vector3 spawnPos = GridManager.PositionOfTile(x, z);
-                spawnPos = new Vector3(spawnPos.x, 1f, spawnPos.z);
+        int x = Random.Range(0, gridManager.width);
+        int z = Random.Range(0, gridManager.height);
 
-                GameObject spawnedObstacle = Instantiate(obstaclePrefab, spawnPos, Quaternion.identity, parentObject);
-                spawnedObstacle.name = $"Obstacle ({x}/{z})";
+        if (IsTileOccupied(x, z)) return;
 
-                spawnedObstacles.Add(spawnedObstacle);
-            }
-        }
+        Vector3 pos = gridManager.PositionOfTile(x, z);
+        pos.y = 1f;
+
+        GameObject obstacle = Instantiate(obstaclePrefab, pos, Quaternion.identity, parentObject);
+        obstacle.name = $"Obstacle ({x}/{z})";
+        spawnedObstacles.Add(obstacle);
     }
 
     public bool IsTileOccupied(int x, int z)
-        {
-            Vector3 checkPos = GridManager.PositionOfTile(x, z);
+    {
+        Vector3 checkPos = gridManager.PositionOfTile(x, z);
+        if (Vector3.Distance(checkPos, snakeHead.position) < 0.1f ||
+            Vector3.Distance(checkPos, gamePoints.CurrentBonusPosition()) < 0.1f)
+            return true;
 
-            if (checkPos == snakeHead.position || checkPos == currentBonus)
+        foreach (GameObject obs in spawnedObstacles)
+            if (obs != null && Vector3.Distance(obs.transform.position, checkPos) < 0.1f)
                 return true;
 
-        foreach (GameObject obstacle in spawnedObstacles)
-            {
-                if (obstacle != null && obstacle.transform.position == checkPos)
-                    return true;
-            }
+        return false;
+    }
 
-            return false;
-        }
-
-
-    private void CheckIfSnakeIsDead()
+    private void CheckCollision()
     {
-        if (GamePoints.IsSnakeDead) return;
-
-        for (int i = spawnedObstacles.Count - 1; i >= 0; i--)
+        foreach (GameObject obs in spawnedObstacles)
         {
-            GameObject obstacle = spawnedObstacles[i];
-            if (obstacle != null && snakeHead.position == obstacle.transform.position)
+            if (obs != null && Vector3.Distance(snakeHead.position, obs.transform.position) < 0.1f)
             {
-                GamePoints.SnakeDead();
-                Destroy(obstacle);
-                spawnedObstacles.RemoveAt(i);
+                gamePoints.SnakeDead();
+                Destroy(obs);
+                spawnedObstacles.Remove(obs);
                 break;
             }
         }

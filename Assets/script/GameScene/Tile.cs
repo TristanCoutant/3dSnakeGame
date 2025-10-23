@@ -1,22 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Tile: MonoBehaviour
+public class Tile : MonoBehaviour
 {
-    [SerializeField] private Color baseColor, offsetColor;
-    [SerializeField] private MeshRenderer _renderer;
+    [SerializeField] private Color baseColor;
+    [SerializeField] private Color offsetColor;
+    [SerializeField] private MeshRenderer meshRenderer;
 
-    void Start()
+    private void Awake()
     {
-        if (_renderer == null)
-        {
-            _renderer = GetComponent<MeshRenderer>();
-        }
+        if (!meshRenderer) meshRenderer = GetComponent<MeshRenderer>();
     }
 
     public void Init(bool isOffset)
     {
-        _renderer.material.color = isOffset ? offsetColor : baseColor;
-}
+        meshRenderer.material.color = isOffset ? offsetColor : baseColor;
+    }
 }
