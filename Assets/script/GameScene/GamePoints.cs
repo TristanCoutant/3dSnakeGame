@@ -14,7 +14,7 @@ public class GamePoints : MonoBehaviour
 
     public int Score { get; private set; }
     public int HighScore { get; private set; }
-    public bool IsSnakeDead { get; private set; }
+    public static bool IsSnakeDead = false;
 
     private void Start()
     {

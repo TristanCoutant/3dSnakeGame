@@ -21,7 +21,7 @@ public class Obstacle : MonoBehaviour
 
     private void Update()
     {
-        if (gamePoints.IsSnakeDead) return;
+        if (GamePoints.IsSnakeDead) return;
 
         timer += Time.deltaTime;
         if (timer >= SpawnInterval)

@@ -37,7 +37,7 @@ public class Move : MonoBehaviour
 
     private void Update()
     {
-        if (gamePoints.IsSnakeDead)
+        if (GamePoints.IsSnakeDead)
         {
             foreach (var seg in bodySegments) Destroy(seg.gameObject);
             bodySegments.Clear();
