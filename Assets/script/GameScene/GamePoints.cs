@@ -8,7 +8,7 @@ public class GamePoints : MonoBehaviour
     [SerializeField] private AudioClip winSound;
     [SerializeField] private AudioClip loseSound;
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private Obstacle obstacleManager;
+    [SerializeField] private ObstacleManager obstacleManager;
 
     private GameObject currentBonus;
 

@@ -1,13 +1,16 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class SceneManagement : MonoBehaviour
 {
-    [SerializeField] private float delaySeconds = 10f;
-    [SerializeField] private string gameSceneName; 
-    [SerializeField] private string startSceneName; 
+    [SerializeField] private float delaySeconds = 3f;
+    [SerializeField] private string gameSceneName = "GameScene";
+    [SerializeField] private string startSceneName = "StartScene";
 
-    [SerializeField] private Transform persistentObjectTransform; 
+    [SerializeField] private Transform persistentObjectTransform;
+
+    private bool isRestarting = false;
 
     private void Start()
     {
@@ -15,42 +18,39 @@ public class SceneManagement : MonoBehaviour
         {
             DontDestroyOnLoad(persistentObjectTransform.gameObject);
         }
-    }  
 
-    private void Start()
-    {
-        Invoke(nameof(StartSceneMethod), delaySeconds);
+        if (SceneManager.GetActiveScene().name == startSceneName)
+        {
+            StartCoroutine(LoadGameSceneAfterDelay());
+        }
     }
 
     private void Update()
     {
-        if (GamePoints.IsSnakeDead == true)
+        if (GamePoints.IsSnakeDead && !isRestarting)
         {
-            LoadNextScene();
+            isRestarting = true;
+            StartCoroutine(RestartGameSequence());
+            GamePoints.IsSnakeDead = false;
         }
     }
 
-    private void StartSceneMethod()
+    private IEnumerator LoadGameSceneAfterDelay()
     {
-        if (!string.IsNullOrEmpty(startSceneName))
-        {
-            SceneManager.LoadScene(startSceneName);
-        }
-        else
-        {
-            Debug.LogError("startSceneName n'est pas défini !");
-        }
+        yield return new WaitForSeconds(delaySeconds);
+        SceneManager.LoadScene(gameSceneName);
     }
 
-    private void LoadNextScene()
+    private IEnumerator RestartGameSequence()
     {
-        if (!string.IsNullOrEmpty(gameSceneName))
-        {
-            SceneManager.LoadScene(gameSceneName);
-        }
-        else
-        {
-            Debug.LogError("gameSceneName n'est pas défini !");
-        }
+        SceneManager.LoadScene(startSceneName);
+
+        yield return null;
+
+        yield return new WaitForSeconds(delaySeconds);
+
+        SceneManager.LoadScene(gameSceneName);
+
+        isRestarting = false;
     }
 }
