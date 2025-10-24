@@ -22,7 +22,9 @@ public class ObstacleManager : MonoBehaviour
 
     private void Update()
     {
-        if (GamePoints.IsSnakeDead) return;
+        // Si le serpent est mort ou détruit, on ne fait rien
+        if (GamePoints.IsSnakeDead || snakeHead == null)
+            return;
 
         timer += Time.deltaTime;
         if (timer >= SpawnInterval)
@@ -55,19 +57,27 @@ public class ObstacleManager : MonoBehaviour
     public bool IsTileOccupied(int x, int z)
     {
         Vector3 checkPos = gridManager.PositionOfTile(x, z);
-        if (Vector3.Distance(checkPos, snakeHead.position) < 0.1f ||
-            Vector3.Distance(checkPos, gamePoints.CurrentBonusPosition()) < 0.1f)
+
+        // On vérifie que snakeHead existe avant d’y accéder
+        if (snakeHead != null && Vector3.Distance(checkPos, snakeHead.position) < 0.1f)
+            return true;
+
+        if (gamePoints != null && Vector3.Distance(checkPos, gamePoints.CurrentBonusPosition()) < 0.1f)
             return true;
 
         foreach (GameObject obs in spawnedObstacles)
+        {
             if (obs != null && Vector3.Distance(obs.transform.position, checkPos) < 0.1f)
                 return true;
+        }
 
         return false;
     }
 
     private void CheckCollision()
     {
+        if (snakeHead == null) return; 
+
         foreach (GameObject obs in spawnedObstacles)
         {
             if (obs != null && Vector3.Distance(snakeHead.position, obs.transform.position) < 0.1f)
@@ -78,6 +88,7 @@ public class ObstacleManager : MonoBehaviour
                 break;
             }
         }
+
         spawnedObstacles.RemoveAll(item => !ObstaclesToDelete.Contains(item));
     }
 }
