@@ -4,24 +4,27 @@ using System.Collections;
 
 public class SceneManagement : MonoBehaviour
 {
-    [SerializeField] private float delaySeconds = 3f;
-    [SerializeField] private string gameSceneName = "GameScene";
-    [SerializeField] private string startSceneName = "StartScene";
-
-    [SerializeField] private Transform persistentObjectTransform;
-
     private bool isRestarting = false;
+    private static bool hasStarted = false;
+
+    private void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+
+        var managers = FindObjectsByType<SceneManagement>(FindObjectsSortMode.None);
+        if (managers.Length > 1)
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
 
     private void Start()
     {
-        if (persistentObjectTransform != null)
+        if (!hasStarted)
         {
-            DontDestroyOnLoad(persistentObjectTransform.gameObject);
-        }
-
-        if (SceneManager.GetActiveScene().name == startSceneName)
-        {
-            StartCoroutine(LoadGameSceneAfterDelay());
+            hasStarted = true;
+            SceneManager.LoadScene("StartScene", LoadSceneMode.Single);
         }
     }
 
@@ -30,27 +33,15 @@ public class SceneManagement : MonoBehaviour
         if (GamePoints.IsSnakeDead && !isRestarting)
         {
             isRestarting = true;
-            StartCoroutine(RestartGameSequence());
+            StartCoroutine(RestartSequence());
             GamePoints.IsSnakeDead = false;
         }
     }
 
-    private IEnumerator LoadGameSceneAfterDelay()
+    private IEnumerator RestartSequence()
     {
-        yield return new WaitForSeconds(delaySeconds);
-        SceneManager.LoadScene(gameSceneName);
-    }
-
-    private IEnumerator RestartGameSequence()
-    {
-        SceneManager.LoadScene(startSceneName);
-
+        SceneManager.LoadScene("StartScene", LoadSceneMode.Single);
         yield return null;
-
-        yield return new WaitForSeconds(delaySeconds);
-
-        SceneManager.LoadScene(gameSceneName);
-
         isRestarting = false;
     }
 }

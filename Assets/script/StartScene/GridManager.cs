@@ -1,7 +1,10 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GridManager : MonoBehaviour
 {
+    public static GridManager Instance { get; private set; }
+
     [SerializeField] public int width;
     [SerializeField] public int height;
     [SerializeField] private Tile tilePrefab;
@@ -9,6 +12,44 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Transform parentObject;
 
     private bool isGridGenerated;
+
+    private Vector3 initialCamPosition;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject); 
+            return;
+        }
+
+        Instance = this;
+
+        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(cam.gameObject);
+
+        initialCamPosition = cam.position;
+    }
+
+    private void Start()
+    {
+        PositionCameraForScene();
+        GenerateGrid();
+    }
+
+    private void PositionCameraForScene()
+    {
+        Scene activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        if (activeScene.name == "StartScene")
+        {
+            cam.position = initialCamPosition; 
+        }
+        else
+        {
+            Vector3 center = transform.position;
+            cam.position = center + new Vector3(0, 25, 0);
+        }
+    }
 
     public void GenerateGrid()
     {
@@ -22,9 +63,7 @@ public class GridManager : MonoBehaviour
         {
             for (int z = 0; z < height; z++)
             {
-                Vector3 spawnPos = new(x + offsetX, 0, z + offsetZ);
-                spawnPos += center;
-
+                Vector3 spawnPos = new Vector3(x + offsetX, 0, z + offsetZ) + center;
                 Tile tile = Instantiate(tilePrefab, spawnPos, Quaternion.identity, parentObject);
                 tile.name = $"Tile ({x}/{z})";
 
@@ -35,6 +74,7 @@ public class GridManager : MonoBehaviour
 
         cam.position = center + new Vector3(0, 25, 0);
         isGridGenerated = true;
+        DontDestroyOnLoad(parentObject.gameObject);
     }
 
     public Vector3 PositionOfTile(int x, int z)

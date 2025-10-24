@@ -3,11 +3,13 @@ using UnityEngine;
 
 public class ObstacleManager : MonoBehaviour
 {
-    [SerializeField] private GridManager gridManager;
+    [Header("Obstacle Settings")]
     [SerializeField] private GameObject obstaclePrefab;
     [SerializeField] private Transform snakeHead;
     [SerializeField] private Transform parentObject;
-    [SerializeField] private GamePoints gamePoints;
+
+    private GridManager gridManager;
+    private GamePoints gamePoints;
 
     private readonly List<GameObject> spawnedObstacles = new();
     private readonly List<GameObject> ObstaclesToDelete = new();
@@ -17,14 +19,25 @@ public class ObstacleManager : MonoBehaviour
 
     private void Start()
     {
+        gridManager = GridManager.Instance;
+        if (gridManager == null)
+        {
+            Debug.LogError("GridManager instance not found!");
+            return;
+        }
+
+        gamePoints = GamePoints.FindFirstObjectByType<GamePoints>();
+        if (gamePoints == null)
+        {
+            Debug.LogWarning("GamePoints not found. Snake scoring will be ignored.");
+        }
+
         maxObstacles = (gridManager.width * gridManager.height) / 2f;
     }
 
     private void Update()
     {
-        // Si le serpent est mort ou détruit, on ne fait rien
-        if (GamePoints.IsSnakeDead || snakeHead == null)
-            return;
+        if (GamePoints.IsSnakeDead || snakeHead == null) return;
 
         timer += Time.deltaTime;
         if (timer >= SpawnInterval)
@@ -58,7 +71,6 @@ public class ObstacleManager : MonoBehaviour
     {
         Vector3 checkPos = gridManager.PositionOfTile(x, z);
 
-        // On vérifie que snakeHead existe avant d’y accéder
         if (snakeHead != null && Vector3.Distance(checkPos, snakeHead.position) < 0.1f)
             return true;
 
@@ -76,13 +88,13 @@ public class ObstacleManager : MonoBehaviour
 
     private void CheckCollision()
     {
-        if (snakeHead == null) return; 
+        if (snakeHead == null) return;
 
         foreach (GameObject obs in spawnedObstacles)
         {
             if (obs != null && Vector3.Distance(snakeHead.position, obs.transform.position) < 0.1f)
             {
-                gamePoints.SnakeDead();
+                gamePoints?.SnakeDead();
                 Destroy(obs);
                 ObstaclesToDelete.Remove(obs);
                 break;

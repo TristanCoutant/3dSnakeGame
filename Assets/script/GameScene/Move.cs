@@ -1,15 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Linq; // Needed for Skip()
 
 public class Move : MonoBehaviour
 {
+    [Header("Snake Settings")]
     [SerializeField] private Transform snakeHead;
     [SerializeField] private Transform bodySegmentPrefab;
     [SerializeField] private Transform parentBodyObject;
-    [SerializeField] private GridManager gridManager;
-    [SerializeField] private GamePoints gamePoints;
     [SerializeField] private float interval = 0.3f;
+
+    private GridManager gridManager;
+    private GamePoints gamePoints;
 
     private readonly List<Vector3> positions = new();
     private readonly List<Transform> bodySegments = new();
@@ -22,7 +25,22 @@ public class Move : MonoBehaviour
 
     private void Start()
     {
+        gridManager = GridManager.Instance;
+        if (gridManager == null)
+        {
+            Debug.LogError("GridManager instance not found! Make sure it exists and uses DontDestroyOnLoad.");
+            return;
+        }
+
+        gamePoints = GamePoints.FindFirstObjectByType<GamePoints>();
+        if (gamePoints == null)
+        {
+            Debug.LogError("GamePoints not found in the scene!");
+            return;
+        }
+
         gridManager.GenerateGrid();
+
         InitializePosition();
         positions.Add(snakeHead.position);
     }
@@ -82,6 +100,7 @@ public class Move : MonoBehaviour
 
     private void MoveSnake()
     {
+        // Update head position based on direction
         switch (direction)
         {
             case 1: j++; snakeHead.rotation = Quaternion.Euler(0, 0, 0); break;     // Up
@@ -90,11 +109,22 @@ public class Move : MonoBehaviour
             case 4: i--; snakeHead.rotation = Quaternion.Euler(0, 270, 0); break;   // Left
         }
 
+        // Wrap around the grid
         i = (i + gridManager.width) % gridManager.width;
         j = (j + gridManager.height) % gridManager.height;
 
         Vector3 pos = gridManager.PositionOfTile(i, j);
         snakeHead.position = new Vector3(pos.x, 1f, pos.z);
+
+        // Check self-collision
+        foreach (var bodyPos in positions.Skip(1))
+        {
+            if (Vector3.Distance(bodyPos, snakeHead.position) < 0.1f)
+            {
+                gamePoints.SnakeDead();
+                return; // Stop moving if dead
+            }
+        }
 
         positions.Insert(0, snakeHead.position);
         while (positions.Count > gamePoints.Score + 1)

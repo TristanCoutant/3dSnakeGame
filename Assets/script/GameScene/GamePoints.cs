@@ -2,14 +2,15 @@ using UnityEngine;
 
 public class GamePoints : MonoBehaviour
 {
-    [SerializeField] private GridManager gridManager;
+    [Header("Snake Settings")]
     [SerializeField] private GameObject bonusPrefab;
     [SerializeField] private Transform snakeHead;
     [SerializeField] private AudioClip winSound;
     [SerializeField] private AudioClip loseSound;
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private ObstacleManager obstacleManager;
 
+    private GridManager gridManager;
+    private ObstacleManager obstacleManager;
     private GameObject currentBonus;
 
     public int Score { get; private set; }
@@ -17,19 +18,30 @@ public class GamePoints : MonoBehaviour
     public static bool IsSnakeDead = false;
 
     private void Start()
+{
+    if (gridManager == null)
+        gridManager = GridManager.Instance;
+
+    if (gridManager == null)
     {
-        SpawnBonus();
+        Debug.LogError("GridManager non trouvé !");
+        return;
     }
+
+    SpawnBonus();
+}
+
 
     private void Update()
     {
-        if (IsSnakeDead || currentBonus == null) return;
+        if (IsSnakeDead || currentBonus == null || snakeHead == null) return;
 
         if (Vector3.Distance(snakeHead.position, currentBonus.transform.position) < 0.1f)
         {
             MoveBonus();
             Score++;
-            audioSource.PlayOneShot(winSound);
+            if (audioSource != null && winSound != null)
+                audioSource.PlayOneShot(winSound);
         }
     }
 
@@ -54,7 +66,7 @@ public class GamePoints : MonoBehaviour
             int x = Random.Range(0, gridManager.width);
             int z = Random.Range(0, gridManager.height);
 
-            if (!obstacleManager.IsTileOccupied(x, z))
+            if (obstacleManager == null || !obstacleManager.IsTileOccupied(x, z))
             {
                 Vector3 pos = gridManager.PositionOfTile(x, z);
                 return new Vector3(pos.x, 1f, pos.z);
@@ -62,7 +74,8 @@ public class GamePoints : MonoBehaviour
         }
     }
 
-    public Vector3 CurrentBonusPosition() => IsSnakeDead || currentBonus == null ? Vector3.zero : currentBonus.transform.position;
+    public Vector3 CurrentBonusPosition() =>
+        IsSnakeDead || currentBonus == null ? Vector3.zero : currentBonus.transform.position;
 
     public void SnakeDead()
     {
@@ -72,7 +85,9 @@ public class GamePoints : MonoBehaviour
         if (currentBonus) Destroy(currentBonus);
         if (snakeHead) Destroy(snakeHead.gameObject);
 
-        audioSource.PlayOneShot(loseSound);
+        if (audioSource != null && loseSound != null)
+            audioSource.PlayOneShot(loseSound);
+
         IsSnakeDead = true;
     }
 }

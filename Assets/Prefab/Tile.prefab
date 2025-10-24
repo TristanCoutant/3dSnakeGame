@@ -113,12 +113,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 3437556373768104739}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74620c0c3f990e444a89338e65b63fe4, type: 3}
+  m_Script: {fileID: 11500000, guid: f16b45e5228f619459cf63a7ab20c082, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tile
-  baseColor: {r: 0.42290697, g: 0.7372549, b: 0.36470586, a: 0.8156863}
-  offsetColor: {r: 0.42108512, g: 0.5754717, b: 0.29045033, a: 0}
-  _renderer: {fileID: 296098550114655555}
+  baseColor: {r: 0.3587732, g: 0.7169812, b: 0.16571736, a: 0}
+  offsetColor: {r: 0.12145432, g: 0.4339623, b: 0.07164471, a: 0}
+  meshRenderer: {fileID: 296098550114655555}
 --- !u!33 &7480560855120781775
 MeshFilter:
   m_ObjectHideFlags: 0
