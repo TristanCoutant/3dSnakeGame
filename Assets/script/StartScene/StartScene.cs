@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class StartScene : MonoBehaviour
 {
@@ -17,20 +18,13 @@ public class StartScene : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
-        DontDestroyOnLoad(gameObject);
     }
 
-    private void Start()
+    private void Update()
     {
-        if (playButton != null)
-            playButton.onClick.AddListener(OnPlayButtonPressed);
-        else
-            Debug.LogError("Le bouton n'est pas assigné dans l'inspecteur !");
-    }
-
-    private void OnPlayButtonPressed()
-    {
-        SceneManager.LoadScene("GameScene", LoadSceneMode.Single);
+        if (Keyboard.current != null && Keyboard.current.enterKey.wasPressedThisFrame)
+        {
+            SceneManager.LoadScene("GameScene", LoadSceneMode.Single);
+        }
     }
 }
