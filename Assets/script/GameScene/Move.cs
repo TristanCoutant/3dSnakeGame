@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Linq; // Needed for Skip()
 
 public class Move : MonoBehaviour
 {
@@ -62,7 +62,7 @@ public class Move : MonoBehaviour
             return;
         }
 
-        HandleInput();
+        HandleMouseInput();
 
         timer += Time.deltaTime;
         if (timer >= interval)
@@ -72,21 +72,34 @@ public class Move : MonoBehaviour
         }
     }
 
-    private void HandleInput()
+    private void HandleMouseInput()
     {
-        var keyboard = Keyboard.current;
-        if (keyboard == null) return;
+        if (Mouse.current == null) return;
 
-        int newDirection = direction;
-
-        if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) newDirection = 1;
-        if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) newDirection = 2;
-        if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) newDirection = 3;
-        if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) newDirection = 4;
-
-        if (!IsOppositeDirection(newDirection, lastDirection))
+        Vector3 mousePos = Mouse.current.position.ReadValue();
+        Ray ray = Camera.main.ScreenPointToRay(mousePos);
+        if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            direction = newDirection;
+            Vector3 targetPos = hit.point;
+            Vector3 delta = targetPos - snakeHead.position;
+
+            int newDirection = direction;
+
+            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.z))
+            {
+                if (delta.x > 0) newDirection = 2; // Right
+                else if (delta.x < 0) newDirection = 4; // Left
+            }
+            else
+            {
+                if (delta.z > 0) newDirection = 1; // Up
+                else if (delta.z < 0) newDirection = 3; // Down
+            }
+
+            if (!IsOppositeDirection(newDirection, lastDirection))
+            {
+                direction = newDirection;
+            }
         }
     }
 
@@ -100,7 +113,6 @@ public class Move : MonoBehaviour
 
     private void MoveSnake()
     {
-        // Update head position based on direction
         switch (direction)
         {
             case 1: j++; snakeHead.rotation = Quaternion.Euler(0, 0, 0); break;     // Up
@@ -109,20 +121,18 @@ public class Move : MonoBehaviour
             case 4: i--; snakeHead.rotation = Quaternion.Euler(0, 270, 0); break;   // Left
         }
 
-        // Wrap around the grid
         i = (i + gridManager.width) % gridManager.width;
         j = (j + gridManager.height) % gridManager.height;
 
         Vector3 pos = gridManager.PositionOfTile(i, j);
         snakeHead.position = new Vector3(pos.x, 1f, pos.z);
 
-        // Check self-collision
         foreach (var bodyPos in positions.Skip(1))
         {
             if (Vector3.Distance(bodyPos, snakeHead.position) < 0.1f)
             {
                 gamePoints.SnakeDead();
-                return; // Stop moving if dead
+                return;
             }
         }
 
@@ -131,7 +141,6 @@ public class Move : MonoBehaviour
             positions.RemoveAt(positions.Count - 1);
 
         UpdateBody();
-
         lastDirection = direction;
     }
 

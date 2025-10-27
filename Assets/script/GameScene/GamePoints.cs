@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEngine;
 
 public class GamePoints : MonoBehaviour
@@ -13,24 +14,32 @@ public class GamePoints : MonoBehaviour
     private ObstacleManager obstacleManager;
     private GameObject currentBonus;
 
+    private string highScoreFilePath;
+
     public int Score { get; private set; }
     public int HighScore { get; private set; }
     public static bool IsSnakeDead = false;
 
-    private void Start()
-{
-    if (gridManager == null)
-        gridManager = GridManager.Instance;
-
-    if (gridManager == null)
+    private void Awake()
     {
-        Debug.LogError("GridManager non trouvé !");
-        return;
+        // Définir le chemin du fichier temporaire pour HighScore
+        highScoreFilePath = Path.Combine(Application.temporaryCachePath, "highscore.txt");
+        LoadHighScore(); // Charger HighScore au lancement
     }
 
-    SpawnBonus();
-}
+    private void Start()
+    {
+        if (gridManager == null)
+            gridManager = GridManager.Instance;
 
+        if (gridManager == null)
+        {
+            Debug.LogError("GridManager non trouvé !");
+            return;
+        }
+
+        SpawnBonus();
+    }
 
     private void Update()
     {
@@ -79,7 +88,13 @@ public class GamePoints : MonoBehaviour
 
     public void SnakeDead()
     {
-        if (Score > HighScore) HighScore = Score;
+        // Mettre à jour HighScore si nécessaire
+        if (Score > HighScore)
+        {
+            HighScore = Score;
+            SaveHighScore(); // Sauvegarde immédiate
+        }
+
         Score = 0;
 
         if (currentBonus) Destroy(currentBonus);
@@ -89,5 +104,42 @@ public class GamePoints : MonoBehaviour
             audioSource.PlayOneShot(loseSound);
 
         IsSnakeDead = true;
+    }
+
+    // ----------------- Sauvegarde / Chargement HighScore -----------------
+    private void SaveHighScore()
+    {
+        try
+        {
+            File.WriteAllText(highScoreFilePath, HighScore.ToString());
+            Debug.Log("HighScore saved to: " + highScoreFilePath);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to save HighScore: " + e.Message);
+        }
+    }
+
+    private void LoadHighScore()
+    {
+        try
+        {
+            if (File.Exists(highScoreFilePath))
+            {
+                string content = File.ReadAllText(highScoreFilePath);
+                HighScore = int.Parse(content);
+                Debug.Log("HighScore loaded: " + HighScore);
+            }
+            else
+            {
+                HighScore = 0;
+                Debug.Log("No temporary HighScore found. Starting from 0.");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to load HighScore: " + e.Message);
+            HighScore = 0;
+        }
     }
 }
