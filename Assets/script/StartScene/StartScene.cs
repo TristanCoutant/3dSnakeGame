@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 
 public class StartScene : MonoBehaviour
 {
-    [SerializeField] private Button playButton;
 
     private void Awake()
     {

@@ -26,7 +26,6 @@ public class GridManager : MonoBehaviour
         Instance = this;
 
         DontDestroyOnLoad(gameObject);
-        DontDestroyOnLoad(cam.gameObject);
 
         initialCamPosition = cam.position;
     }

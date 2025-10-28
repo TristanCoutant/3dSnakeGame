@@ -88,11 +88,10 @@ public class GamePoints : MonoBehaviour
 
     public void SnakeDead()
     {
-        // Mettre à jour HighScore si nécessaire
         if (Score > HighScore)
         {
             HighScore = Score;
-            SaveHighScore(); // Sauvegarde immédiate
+            SaveHighScore(); 
         }
 
         Score = 0;
@@ -106,7 +105,6 @@ public class GamePoints : MonoBehaviour
         IsSnakeDead = true;
     }
 
-    // ----------------- Sauvegarde / Chargement HighScore -----------------
     private void SaveHighScore()
     {
         try
