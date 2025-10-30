@@ -119,6 +119,65 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &58696908
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 58696909}
+  - component: {fileID: 58696910}
+  m_Layer: 0
+  m_Name: DigitDisplay
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &58696909
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 58696908}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.5899, y: 0.18316, z: -2.15144}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &58696910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 58696908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17c25f2c65115924b9da4ed3e6f55371, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DigitDisplay
+  digitPrefabs:
+  - {fileID: 919132149155446097, guid: cbd2cce78715ab541a7dd0c3bca91fbc, type: 3}
+  - {fileID: 919132149155446097, guid: 335b3410348e33c4dbcaf444a71bed26, type: 3}
+  - {fileID: 919132149155446097, guid: 8e08b32b086c49f409181624208cc503, type: 3}
+  - {fileID: 919132149155446097, guid: b96c15dc259bcc64eb6ef665eabe130c, type: 3}
+  - {fileID: 919132149155446097, guid: 959615b476ef2c24a88ab10b665a3bca, type: 3}
+  - {fileID: 919132149155446097, guid: 9718407a56436014aa43bae943a6658d, type: 3}
+  - {fileID: 919132149155446097, guid: 1010f175a9114644eb343e4c81f17845, type: 3}
+  - {fileID: 919132149155446097, guid: 053dc33376fc3954e950d7452f941538, type: 3}
+  - {fileID: 919132149155446097, guid: 9d019e28af5292544a26ee8ea5ec587a, type: 3}
+  - {fileID: 919132149155446097, guid: c56c579045cdef441b9360e74b0b836b, type: 3}
+  scoreStartPosition: {x: -3, y: 1, z: 0}
+  digitSpacing: 1
+  scoreSpacing: 4
+  scoreTracker: {fileID: 0}
 --- !u!1 &226833636
 GameObject:
   m_ObjectHideFlags: 0
@@ -330,6 +389,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StartScene
   scoreTracker: {fileID: 1849693898}
+  digitDisplay: {fileID: 0}
 --- !u!4 &436408095
 Transform:
   m_ObjectHideFlags: 0
@@ -741,3 +801,4 @@ SceneRoots:
   - {fileID: 436408095}
   - {fileID: 1793705085}
   - {fileID: 1849693897}
+  - {fileID: 58696909}
