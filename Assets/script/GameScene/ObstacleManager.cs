@@ -12,32 +12,45 @@ public class ObstacleManager : MonoBehaviour
     private GamePoints gamePoints;
 
     private readonly List<GameObject> spawnedObstacles = new();
-    private readonly List<GameObject> ObstaclesToDelete = new();
+    private readonly List<GameObject> obstaclesToDelete = new();
+
     private float timer;
     private float maxObstacles;
     private const float SpawnInterval = 4f;
 
+    public bool IsInitialized { get; private set; } = false;
+
+    private void Awake()
+    {
+        AutoFindDependencies();
+    }
+
     private void Start()
     {
-        gridManager = GridManager.Instance;
-        if (gridManager == null)
+        StartCoroutine(InitializeWhenReady());
+    }
+
+    private System.Collections.IEnumerator InitializeWhenReady()
+    {
+        while (gridManager == null)
         {
-            Debug.LogError("GridManager instance not found!");
-            return;
+            gridManager = FindFirstObjectByType<GridManager>();
+            yield return null;
         }
 
-        gamePoints = GamePoints.FindFirstObjectByType<GamePoints>();
-        if (gamePoints == null)
+        while (gamePoints == null)
         {
-            Debug.LogWarning("GamePoints not found. Snake scoring will be ignored.");
+            gamePoints = FindFirstObjectByType<GamePoints>();
+            yield return null;
         }
 
         maxObstacles = (gridManager.width * gridManager.height) / 2f;
+        IsInitialized = true;
     }
 
     private void Update()
     {
-        if (GamePoints.IsSnakeDead || snakeHead == null) return;
+        if (!IsInitialized || GamePoints.IsSnakeDead || snakeHead == null) return;
 
         timer += Time.deltaTime;
         if (timer >= SpawnInterval)
@@ -49,14 +62,35 @@ public class ObstacleManager : MonoBehaviour
         CheckCollision();
     }
 
+    private void AutoFindDependencies()
+    {
+        if (gridManager == null)
+            gridManager = FindFirstObjectByType<GridManager>();
+
+        if (gamePoints == null)
+            gamePoints = FindFirstObjectByType<GamePoints>();
+
+        if (snakeHead == null)
+        {
+            Move snake = FindFirstObjectByType<Move>();
+            if (snake != null)
+                snakeHead = snake.transform;
+        }
+    }
+
     private void SpawnObstacle()
     {
-        if (spawnedObstacles.Count >= maxObstacles) return;
+        if (!IsInitialized || gridManager == null || obstaclePrefab == null)
+            return;
+
+        if (spawnedObstacles.Count >= maxObstacles)
+            return;
 
         int x = Random.Range(0, gridManager.width);
         int z = Random.Range(0, gridManager.height);
 
-        if (IsTileOccupied(x, z)) return;
+        if (IsTileOccupied(x, z))
+            return;
 
         Vector3 pos = gridManager.PositionOfTile(x, z);
         pos.y = 1f;
@@ -64,11 +98,14 @@ public class ObstacleManager : MonoBehaviour
         GameObject obstacle = Instantiate(obstaclePrefab, pos, Quaternion.identity, parentObject);
         obstacle.name = $"Obstacle ({x}/{z})";
         spawnedObstacles.Add(obstacle);
-        ObstaclesToDelete.Add(obstacle);
+        obstaclesToDelete.Add(obstacle);
     }
 
     public bool IsTileOccupied(int x, int z)
     {
+        if (!IsInitialized || gridManager == null)
+            return false;
+
         Vector3 checkPos = gridManager.PositionOfTile(x, z);
 
         if (snakeHead != null && Vector3.Distance(checkPos, snakeHead.position) < 0.1f)
@@ -88,19 +125,23 @@ public class ObstacleManager : MonoBehaviour
 
     private void CheckCollision()
     {
-        if (snakeHead == null) return;
+        if (!IsInitialized || snakeHead == null)
+            return;
 
-        foreach (GameObject obs in spawnedObstacles)
+        for (int i = spawnedObstacles.Count - 1; i >= 0; i--)
         {
-            if (obs != null && Vector3.Distance(snakeHead.position, obs.transform.position) < 0.1f)
+            GameObject obs = spawnedObstacles[i];
+            if (obs == null) continue;
+
+            if (Vector3.Distance(snakeHead.position, obs.transform.position) < 0.1f)
             {
                 gamePoints?.SnakeDead();
                 Destroy(obs);
-                ObstaclesToDelete.Remove(obs);
-                break;
+                obstaclesToDelete.Remove(obs);
+                spawnedObstacles.RemoveAt(i);
             }
         }
 
-        spawnedObstacles.RemoveAll(item => !ObstaclesToDelete.Contains(item));
+        spawnedObstacles.RemoveAll(item => item == null);
     }
 }
