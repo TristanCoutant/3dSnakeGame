@@ -5,12 +5,17 @@ using UnityEngine.InputSystem;
 
 public class Move : MonoBehaviour
 {
+    public enum ControlMode { Keyboard, Mouse }
+
     [Header("Snake Settings")]
     [SerializeField] private Transform snakeHead;
     [SerializeField] private Transform bodySegmentPrefab;
     [SerializeField] private Transform parentBodyObject;
     [SerializeField] private float interval = 0.3f;
     [SerializeField] private ScoreTracker scoreTracker;
+
+    [Header("Control Settings")]
+    [SerializeField] private ControlMode controlMode = ControlMode.Keyboard;
 
     private GridManager gridManager;
     private GamePoints gamePoints;
@@ -26,7 +31,6 @@ public class Move : MonoBehaviour
 
     private void Awake()
     {
-        // Assigner automatiquement ScoreTracker
         if (scoreTracker == null)
             scoreTracker = FindFirstObjectByType<ScoreTracker>();
     }
@@ -40,7 +44,6 @@ public class Move : MonoBehaviour
             return;
         }
 
-        // Trouver GamePoints (version moderne, sans warning)
         gamePoints = GamePoints.FindFirstObjectByType<GamePoints>();
         if (gamePoints == null)
         {
@@ -49,7 +52,6 @@ public class Move : MonoBehaviour
         }
 
         gridManager.GenerateGrid();
-
         InitializePosition();
         positions.Add(snakeHead.position);
     }
@@ -68,12 +70,11 @@ public class Move : MonoBehaviour
         {
             foreach (var seg in bodySegments)
                 Destroy(seg.gameObject);
-
             bodySegments.Clear();
             return;
         }
 
-        HandleInput(); // gère souris + flèches
+        HandleInput();
 
         timer += Time.deltaTime;
         if (timer >= interval)
@@ -83,50 +84,57 @@ public class Move : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Gère les entrées clavier et souris.
-    /// </summary>
     private void HandleInput()
     {
-        // Flèches directionnelles
-        if (Keyboard.current != null)
+        switch (controlMode)
         {
-            if (Keyboard.current.upArrowKey.wasPressedThisFrame && lastDirection != 3)
-                direction = 1; // haut
-            else if (Keyboard.current.rightArrowKey.wasPressedThisFrame && lastDirection != 4)
-                direction = 2; // droite
-            else if (Keyboard.current.downArrowKey.wasPressedThisFrame && lastDirection != 1)
-                direction = 3; // bas
-            else if (Keyboard.current.leftArrowKey.wasPressedThisFrame && lastDirection != 2)
-                direction = 4; // gauche
+            case ControlMode.Keyboard:
+                HandleKeyboardInput();
+                break;
+            case ControlMode.Mouse:
+                HandleMouseInput();
+                break;
         }
+    }
 
-        // Souris (clic ou position)
+    private void HandleKeyboardInput()
+    {
+        if (Keyboard.current == null) return;
+
+        if (Keyboard.current.upArrowKey.wasPressedThisFrame && lastDirection != 3)
+            direction = 1;
+        else if (Keyboard.current.rightArrowKey.wasPressedThisFrame && lastDirection != 4)
+            direction = 2;
+        else if (Keyboard.current.downArrowKey.wasPressedThisFrame && lastDirection != 1)
+            direction = 3;
+        else if (Keyboard.current.leftArrowKey.wasPressedThisFrame && lastDirection != 2)
+            direction = 4;
+    }
+
+    private void HandleMouseInput()
+    {
         if (Mouse.current == null) return;
 
         Vector3 mousePos = Mouse.current.position.ReadValue();
         Ray ray = Camera.main.ScreenPointToRay(mousePos);
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        if (!Physics.Raycast(ray, out RaycastHit hit)) return;
+
+        Vector3 targetPos = hit.point;
+        Vector3 delta = targetPos - snakeHead.position;
+
+        int newDirection = direction;
+
+        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.z))
         {
-            Vector3 targetPos = hit.point;
-            Vector3 delta = targetPos - snakeHead.position;
-
-            int newDirection = direction;
-
-            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.z))
-            {
-                if (delta.x > 0) newDirection = 2; // droite
-                else if (delta.x < 0) newDirection = 4; // gauche
-            }
-            else
-            {
-                if (delta.z > 0) newDirection = 1; // haut
-                else if (delta.z < 0) newDirection = 3; // bas
-            }
-
-            if (!IsOppositeDirection(newDirection, lastDirection))
-                direction = newDirection;
+            newDirection = delta.x > 0 ? 2 : 4;
         }
+        else
+        {
+            newDirection = delta.z > 0 ? 1 : 3;
+        }
+
+        if (!IsOppositeDirection(newDirection, lastDirection))
+            direction = newDirection;
     }
 
     private bool IsOppositeDirection(int dir1, int dir2)
@@ -141,20 +149,18 @@ public class Move : MonoBehaviour
     {
         switch (direction)
         {
-            case 1: j++; snakeHead.rotation = Quaternion.Euler(0, 0, 0); break;      // haut
-            case 2: i++; snakeHead.rotation = Quaternion.Euler(0, 90, 0); break;     // droite
-            case 3: j--; snakeHead.rotation = Quaternion.Euler(0, 180, 0); break;    // bas
-            case 4: i--; snakeHead.rotation = Quaternion.Euler(0, 270, 0); break;    // gauche
+            case 1: j++; snakeHead.rotation = Quaternion.Euler(0, 0, 0); break;
+            case 2: i++; snakeHead.rotation = Quaternion.Euler(0, 90, 0); break;
+            case 3: j--; snakeHead.rotation = Quaternion.Euler(0, 180, 0); break;
+            case 4: i--; snakeHead.rotation = Quaternion.Euler(0, 270, 0); break;
         }
 
-        // boucle sur les bords
         i = (i + gridManager.width) % gridManager.width;
         j = (j + gridManager.height) % gridManager.height;
 
         Vector3 pos = gridManager.PositionOfTile(i, j);
         snakeHead.position = new Vector3(pos.x, 1f, pos.z);
 
-        // collision avec soi-même
         foreach (var bodyPos in positions.Skip(1))
         {
             if (Vector3.Distance(bodyPos, snakeHead.position) < 0.1f)
@@ -164,7 +170,6 @@ public class Move : MonoBehaviour
             }
         }
 
-        // avance
         positions.Insert(0, snakeHead.position);
         while (positions.Count > scoreTracker.score + 1)
             positions.RemoveAt(positions.Count - 1);

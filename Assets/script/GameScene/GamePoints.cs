@@ -94,7 +94,7 @@ public class GamePoints : MonoBehaviour
         while (!obstacleManager.IsInitialized)
             yield return null;
 
-        yield return new WaitForEndOfFrame(); // Wait one frame for safety
+        yield return new WaitForEndOfFrame();
         SpawnBonus();
     }
 
@@ -114,7 +114,6 @@ public class GamePoints : MonoBehaviour
         }
     }
 
-    // ✅ Fixed version to prevent ghost apples
     private void SpawnBonus()
     {
         if (IsSnakeDead || bonusPrefab == null) return;
