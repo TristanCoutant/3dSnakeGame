@@ -1,16 +1,15 @@
-// DigitDisplay.cs
 using UnityEngine;
 using System.Collections.Generic;
 
 public class DigitDisplay : MonoBehaviour
 {
     [Header("Digit Prefabs")]
-    [SerializeField] private GameObject[] digitPrefabs; // Assign 0-9 in inspector
+    [SerializeField] private GameObject[] digitPrefabs;
     
     [Header("Score Display")]
     [SerializeField] private Vector3 scoreStartPosition = new Vector3(-2f, 0f, 0f);
     [SerializeField] private float digitSpacing = 1.5f;
-    [SerializeField] private float scoreSpacing = 3f; // Space between score and highscore
+    [SerializeField] private float scoreSpacing = 3f; 
     
     [Header("References")]
     [SerializeField] private ScoreTracker scoreTracker;

@@ -79,27 +79,22 @@ public class GamePoints : MonoBehaviour
 
     private IEnumerator WaitAndSpawn()
     {
-        // Wait until GridManager exists
         while (gridManager == null)
         {
             gridManager = FindFirstObjectByType<GridManager>();
             yield return null;
         }
 
-        // Wait until ObstacleManager exists
         while (obstacleManager == null)
         {
             obstacleManager = FindFirstObjectByType<ObstacleManager>();
             yield return null;
         }
 
-        // Wait until obstacles are fully initialized
         while (!obstacleManager.IsInitialized)
             yield return null;
 
-        // Small delay to ensure all objects are placed
-        yield return new WaitForEndOfFrame();
-
+        yield return new WaitForEndOfFrame(); // Wait one frame for safety
         SpawnBonus();
     }
 
@@ -112,19 +107,18 @@ public class GamePoints : MonoBehaviour
             MoveBonus();
 
             if (scoreTracker != null)
-                scoreTracker.score++;
+                scoreTracker.AddScore(1);
 
             if (audioSource != null && winSound != null)
                 audioSource.PlayOneShot(winSound);
         }
     }
 
-    // ✅ Fixed SpawnBonus to prevent ghost apples
+    // ✅ Fixed version to prevent ghost apples
     private void SpawnBonus()
     {
         if (IsSnakeDead || bonusPrefab == null) return;
 
-        // Ensure dependencies are ready
         if (gridManager == null || obstacleManager == null || !obstacleManager.IsInitialized)
         {
             StartCoroutine(RetrySpawnBonus());
@@ -132,17 +126,14 @@ public class GamePoints : MonoBehaviour
         }
 
         Vector3 spawnPos = GetRandomFreePosition();
-
         if (spawnPos == Vector3.zero)
         {
             StartCoroutine(RetrySpawnBonus());
             return;
         }
 
-        // Fix Y alignment with the snake
         spawnPos.y = snakeHead != null ? snakeHead.position.y : 0.5f;
 
-        // Destroy any leftover ghost apples
         if (currentBonus != null)
             Destroy(currentBonus);
 
@@ -215,6 +206,9 @@ public class GamePoints : MonoBehaviour
 
         if (audioSource != null && loseSound != null)
             audioSource.PlayOneShot(loseSound);
+
+        if (scoreTracker != null)
+            scoreTracker.CheckAndSaveHighscore();
 
         IsSnakeDead = true;
     }

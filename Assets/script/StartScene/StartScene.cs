@@ -1,4 +1,3 @@
-// Updated StartScene.cs
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
@@ -6,7 +5,7 @@ using UnityEngine.InputSystem;
 public class StartScene : MonoBehaviour
 {
     [SerializeField] private ScoreTracker scoreTracker;
-    [SerializeField] private DigitDisplay digitDisplay; 
+    [SerializeField] private DigitDisplay digitDisplay;
 
     private void Awake()
     {
@@ -28,9 +27,11 @@ public class StartScene : MonoBehaviour
 
         if (scoreTracker != null)
         {
+            scoreTracker.ResetScore();
+
             Debug.Log($"Dernier score : {scoreTracker.score}");
             Debug.Log($"Highscore : {scoreTracker.highScore}");
-            
+
             if (digitDisplay != null)
                 digitDisplay.DisplayScores();
         }
@@ -40,6 +41,7 @@ public class StartScene : MonoBehaviour
     {
         if (Keyboard.current != null && Keyboard.current.enterKey.wasPressedThisFrame)
         {
+            GamePoints.IsSnakeDead = false;
             SceneManager.LoadScene("GameScene", LoadSceneMode.Single);
         }
     }
