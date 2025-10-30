@@ -15,9 +15,15 @@ public class GamePoints : MonoBehaviour
     [SerializeField] private GridManager gridManager;
     [SerializeField] private ObstacleManager obstacleManager;
     [SerializeField] private ScoreTracker scoreTracker;
+    [SerializeField] private Move moveScript;
 
     private GameObject currentBonus;
-    public static bool IsSnakeDead = false;
+    public static bool IsSnakeDead { get; set; }
+
+    public static void ResetGameState()
+    {
+        IsSnakeDead = false;
+    }
 
     private void Awake()
     {
@@ -30,6 +36,8 @@ public class GamePoints : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
         AutoFindDependencies();
+        
+        ResetGameState();
     }
 
     private void OnEnable()
@@ -44,6 +52,7 @@ public class GamePoints : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        ResetGameState(); 
         AutoFindDependencies();
         StartCoroutine(StartAfterSceneLoad());
     }
@@ -65,6 +74,9 @@ public class GamePoints : MonoBehaviour
             if (move != null)
                 snakeHead = move.transform;
         }
+        
+        if (moveScript == null)
+            moveScript = FindFirstObjectByType<Move>();
     }
 
     private IEnumerator Start()
@@ -95,6 +107,13 @@ public class GamePoints : MonoBehaviour
             yield return null;
 
         yield return new WaitForEndOfFrame();
+        
+        if (currentBonus != null)
+        {
+            Destroy(currentBonus);
+            currentBonus = null;
+        }
+        
         SpawnBonus();
     }
 
@@ -200,8 +219,11 @@ public class GamePoints : MonoBehaviour
 
     public void SnakeDead()
     {
-        if (currentBonus != null) Destroy(currentBonus);
-        if (snakeHead != null) Destroy(snakeHead.gameObject);
+        if (currentBonus != null) 
+        {
+            Destroy(currentBonus);
+            currentBonus = null;
+        }
 
         if (audioSource != null && loseSound != null)
             audioSource.PlayOneShot(loseSound);
@@ -210,5 +232,11 @@ public class GamePoints : MonoBehaviour
             scoreTracker.CheckAndSaveHighscore();
 
         IsSnakeDead = true;
+    }
+    
+    private void OnDestroy()
+    {
+        if (currentBonus != null)
+            Destroy(currentBonus);
     }
 }

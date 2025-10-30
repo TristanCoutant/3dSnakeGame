@@ -37,11 +37,6 @@ public class ScoreTracker : MonoBehaviour
         }
     }
 
-    public void ResetScore()
-    {
-        score = 0;
-    }
-
     private void OnApplicationQuit()
     {
         PlayerPrefs.SetInt("HighScore", highScore);

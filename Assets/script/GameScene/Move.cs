@@ -40,11 +40,11 @@ public class Move : MonoBehaviour
         gridManager = GridManager.Instance;
         if (gridManager == null)
         {
-            Debug.LogError("GridManager instance not found! Make sure it exists and uses DontDestroyOnLoad.");
+            Debug.LogError("GridManager instance not found!");
             return;
         }
 
-        gamePoints = GamePoints.FindFirstObjectByType<GamePoints>();
+        gamePoints = FindFirstObjectByType<GamePoints>();
         if (gamePoints == null)
         {
             Debug.LogError("GamePoints not found in the scene!");
@@ -52,27 +52,12 @@ public class Move : MonoBehaviour
         }
 
         gridManager.GenerateGrid();
-        InitializePosition();
-        positions.Add(snakeHead.position);
-    }
-
-    private void InitializePosition()
-    {
-        i = gridManager.width / 4;
-        j = gridManager.height / 2;
-        Vector3 pos = gridManager.PositionOfTile(i, j);
-        snakeHead.position = new Vector3(pos.x, 1f, pos.z);
+        ResetSnake();
     }
 
     private void Update()
     {
-        if (GamePoints.IsSnakeDead)
-        {
-            foreach (var seg in bodySegments)
-                Destroy(seg.gameObject);
-            bodySegments.Clear();
-            return;
-        }
+        if (GamePoints.IsSnakeDead) return;
 
         HandleInput();
 
@@ -119,19 +104,13 @@ public class Move : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(mousePos);
         if (!Physics.Raycast(ray, out RaycastHit hit)) return;
 
-        Vector3 targetPos = hit.point;
-        Vector3 delta = targetPos - snakeHead.position;
-
+        Vector3 delta = hit.point - snakeHead.position;
         int newDirection = direction;
 
         if (Mathf.Abs(delta.x) > Mathf.Abs(delta.z))
-        {
             newDirection = delta.x > 0 ? 2 : 4;
-        }
         else
-        {
             newDirection = delta.z > 0 ? 1 : 3;
-        }
 
         if (!IsOppositeDirection(newDirection, lastDirection))
             direction = newDirection;
@@ -161,11 +140,12 @@ public class Move : MonoBehaviour
         Vector3 pos = gridManager.PositionOfTile(i, j);
         snakeHead.position = new Vector3(pos.x, 1f, pos.z);
 
+        // Check collision with body
         foreach (var bodyPos in positions.Skip(1))
         {
             if (Vector3.Distance(bodyPos, snakeHead.position) < 0.1f)
             {
-                gamePoints.SnakeDead();
+                SnakeDead();
                 return;
             }
         }
@@ -180,12 +160,21 @@ public class Move : MonoBehaviour
 
     private void UpdateBody()
     {
+        // Create missing segments
         while (bodySegments.Count < scoreTracker.score)
         {
             Transform newSeg = Instantiate(bodySegmentPrefab, parentBodyObject);
             bodySegments.Add(newSeg);
         }
 
+        // Remove extra segments
+        while (bodySegments.Count > scoreTracker.score)
+        {
+            Destroy(bodySegments[^1].gameObject);
+            bodySegments.RemoveAt(bodySegments.Count - 1);
+        }
+
+        // Update positions
         for (int k = 0; k < bodySegments.Count; k++)
         {
             if (k + 1 < positions.Count)
@@ -194,5 +183,51 @@ public class Move : MonoBehaviour
                 bodySegments[k].position = new Vector3(target.x, 1f, target.z);
             }
         }
+    }
+
+    public void SnakeDead()
+    {
+        GamePoints.IsSnakeDead = true; // This should work now
+        if (gamePoints != null)
+            gamePoints.SnakeDead();
+        DestroySnakeBody();
+    }
+
+    private void DestroySnakeBody()
+    {
+        foreach (var seg in bodySegments)
+            if (seg != null) Destroy(seg.gameObject);
+
+        bodySegments.Clear();
+        positions.Clear();
+    }
+
+    public void ResetSnake()
+    {
+        DestroySnakeBody();
+        i = gridManager.width / 4;
+        j = gridManager.height / 2;
+        Vector3 pos = gridManager.PositionOfTile(i, j);
+        snakeHead.position = new Vector3(pos.x, 1f, pos.z);
+        positions.Add(snakeHead.position);
+        direction = 2;
+        lastDirection = 2;
+        
+        // Reset the game state through GamePoints
+        if (gamePoints != null)
+        {
+            GamePoints.ResetGameState();
+        }
+        else
+        {
+            GamePoints.IsSnakeDead = false;
+        }
+    }
+    
+    // Reset when enabled
+    private void OnEnable()
+    {
+        if (gridManager != null) // Only reset if gridManager is already set up
+            ResetSnake();
     }
 }

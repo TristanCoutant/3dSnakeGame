@@ -22,12 +22,12 @@ public class StartScene : MonoBehaviour
 
     private void Start()
     {
+        scoreTracker.score = 0;
         if (digitDisplay == null)
             digitDisplay = FindFirstObjectByType<DigitDisplay>();
 
         if (scoreTracker != null)
         {
-            scoreTracker.ResetScore();
 
             Debug.Log($"Dernier score : {scoreTracker.score}");
             Debug.Log($"Highscore : {scoreTracker.highScore}");

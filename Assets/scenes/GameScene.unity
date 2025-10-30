@@ -153,9 +153,10 @@ MonoBehaviour:
   winSound: {fileID: 8300000, guid: 57b9049d3c11b1342835bd841949e305, type: 3}
   loseSound: {fileID: 8300000, guid: 937f603a6fd802f40b1f70779b6eea75, type: 3}
   audioSource: {fileID: 83918640}
-  scoreTracker: {fileID: 0}
   gridManager: {fileID: 0}
   obstacleManager: {fileID: 505912612}
+  scoreTracker: {fileID: 0}
+  moveScript: {fileID: 2025351847}
 --- !u!4 &69106940
 Transform:
   m_ObjectHideFlags: 0
@@ -795,6 +796,7 @@ MonoBehaviour:
   parentBodyObject: {fileID: 2025351848}
   interval: 0.2
   scoreTracker: {fileID: 0}
+  controlMode: 0
 --- !u!4 &2025351848 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 80366833f259ac9488734a55360f0072, type: 3}
