@@ -36,13 +36,11 @@ Designed and implemented as part of my internship project at **Ameria**.
 
 ## How to Try It
 
-1. **Download or clone** this repository  
-2. **Open** the project in *Unity 2021.3 or newer* 
-3. Navigate to: ``/Assets/Scenes/GameScene``
-4. Chose in SnakeHead KeyboarMovement or MouseMovement
-5. Go on ``/Assets/Scenes/StartScene``
-4. Click **Play** in the Unity Editor  
-5. Enjoy, and try to beat your high score!
+1. Open the Release folder.
+2. Choose the version you want to play.
+3. Double-click the file with the version name.
+4. Enjoy the game!
+   
 
 ---
 
