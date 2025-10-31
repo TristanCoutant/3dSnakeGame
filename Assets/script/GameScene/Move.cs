@@ -37,6 +37,7 @@ public class Move : MonoBehaviour
 
     private void Start()
     {
+        scoreTracker.score = 0;
         gridManager = GridManager.Instance;
         if (gridManager == null)
         {
@@ -140,7 +141,6 @@ public class Move : MonoBehaviour
         Vector3 pos = gridManager.PositionOfTile(i, j);
         snakeHead.position = new Vector3(pos.x, 1f, pos.z);
 
-        // Check collision with body
         foreach (var bodyPos in positions.Skip(1))
         {
             if (Vector3.Distance(bodyPos, snakeHead.position) < 0.1f)
@@ -160,21 +160,18 @@ public class Move : MonoBehaviour
 
     private void UpdateBody()
     {
-        // Create missing segments
         while (bodySegments.Count < scoreTracker.score)
         {
             Transform newSeg = Instantiate(bodySegmentPrefab, parentBodyObject);
             bodySegments.Add(newSeg);
         }
 
-        // Remove extra segments
         while (bodySegments.Count > scoreTracker.score)
         {
             Destroy(bodySegments[^1].gameObject);
             bodySegments.RemoveAt(bodySegments.Count - 1);
         }
 
-        // Update positions
         for (int k = 0; k < bodySegments.Count; k++)
         {
             if (k + 1 < positions.Count)
@@ -187,7 +184,7 @@ public class Move : MonoBehaviour
 
     public void SnakeDead()
     {
-        GamePoints.IsSnakeDead = true; // This should work now
+        GamePoints.IsSnakeDead = true;
         if (gamePoints != null)
             gamePoints.SnakeDead();
         DestroySnakeBody();
@@ -213,7 +210,6 @@ public class Move : MonoBehaviour
         direction = 2;
         lastDirection = 2;
         
-        // Reset the game state through GamePoints
         if (gamePoints != null)
         {
             GamePoints.ResetGameState();
@@ -224,10 +220,9 @@ public class Move : MonoBehaviour
         }
     }
     
-    // Reset when enabled
     private void OnEnable()
     {
-        if (gridManager != null) // Only reset if gridManager is already set up
+        if (gridManager != null) 
             ResetSnake();
     }
 }
