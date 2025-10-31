@@ -4,6 +4,9 @@ using System.Collections;
 
 public class SceneManagement : MonoBehaviour
 {
+    
+    [SerializeField] private AudioClip loseSound;
+    [SerializeField] private AudioSource audioSource;
     private bool isRestarting = false;
     private static bool hasStarted = false;
 
@@ -43,5 +46,10 @@ public class SceneManagement : MonoBehaviour
         SceneManager.LoadScene("StartScene", LoadSceneMode.Single);
         yield return null;
         isRestarting = false;
+
+        if (audioSource == null)
+            audioSource = FindFirstObjectByType<AudioSource>();
+
+        audioSource.PlayOneShot(loseSound);
     }
 }

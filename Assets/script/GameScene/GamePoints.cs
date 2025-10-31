@@ -7,9 +7,8 @@ public class GamePoints : MonoBehaviour
     [Header("Snake Settings")]
     [SerializeField] private GameObject bonusPrefab;
     [SerializeField] private Transform snakeHead;
-    [SerializeField] private AudioClip winSound;
-    [SerializeField] private AudioClip loseSound;
     [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip winSound;
 
     [Header("Managers")]
     [SerializeField] private GridManager gridManager;
@@ -127,9 +126,11 @@ public class GamePoints : MonoBehaviour
 
             if (scoreTracker != null)
                 scoreTracker.AddScore(1);
+                
+        if (audioSource == null)
+            audioSource = FindFirstObjectByType<AudioSource>();
 
-            if (audioSource != null && winSound != null)
-                audioSource.PlayOneShot(winSound);
+            audioSource.PlayOneShot(winSound);
         }
     }
 
@@ -225,8 +226,6 @@ public class GamePoints : MonoBehaviour
             currentBonus = null;
         }
 
-        if (audioSource != null && loseSound != null)
-            audioSource.PlayOneShot(loseSound);
 
         if (scoreTracker != null)
             scoreTracker.CheckAndSaveHighscore();
